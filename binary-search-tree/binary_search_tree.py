@@ -1,9 +1,10 @@
+import pdb
 from typing import List
+
 
 class Node:
 
-    def __init__(self, parent, left, right, key: int):
-        self.parent = parent
+    def __init__(self, left, right, key: int):
         self.left = left
         self.right = right
         self.key = key
@@ -11,23 +12,15 @@ class Node:
 
 class Tree:
     def __init__(self):
-        self.head = None 
-
-    def build(self, numbers: List[int]):
-        middle = int(len(numbers) / 2)
-        self.head = Node(None, None, None, numbers[middle])
-        for index, item in enumerate(numbers):
-            if index == middle:
-                continue
-            self.add_node(item) 
+        self.root = None 
     
     def add_node(self, key: int):
-        if self.head is None:
-            self.head = Node(None, None, None, key)
-        elif self.head.key == key:
+        if self.root is None:
+            self.root = Node(None, None, key)
+        elif self.root.key == key:
             return
         else:
-            self._recursive_add(self.head, key)
+            self._recursive_add(self.root, key)
 
     def _recursive_add(self, node: Node, key: int):
         if node.key > key:
@@ -37,7 +30,7 @@ class Tree:
         
     def _add_left_node(self, node: Node, key: int):
         if node.left is None:
-            node.left = Node(node, None, None, key)
+            node.left = Node(None, None, key)
         elif node.left.key == key:
             return 
         else:
@@ -45,7 +38,7 @@ class Tree:
 
     def _add_right_node(self, node: Node, key: int):
         if node.right is None:
-            node.right = Node(node, None, None, key)
+            node.right = Node(None, None, key)
         elif node.right.key == key:
             return
         else:
@@ -60,9 +53,79 @@ class Tree:
         else:
             return self.search_key(node.left, key)
 
-    def inorder_walk(self, node: Node) -> Node:
+    def inorder_walk(self, node: Node, nodes: List[Node] = []) -> List[Node]:
         if node:
-            self.inorder_walk(node.left)
-            print(node.key, end=' ')
-            self.inorder_walk(node.right) 
+            self.inorder_walk(node.left, nodes)
+            nodes.append(node)
+            self.inorder_walk(node.right, nodes)
+    
+    def inorder_walk_reverse(self, node: Node, nodes: List[Node] = []) -> List[Node]:
+        if node:
+            self.inorder_walk_reverse(node.right, nodes)
+            nodes.append(node)
+            self.inorder_walk_reverse(node.left, nodes)
 
+    def rotate_left(self, node: Node):
+        reversed_node = node.right
+        node.right = reversed_node.left
+        reversed_node.left = node
+        return reversed_node
+    
+    def rotate_right(self, node: Node):
+        reversed_node = node.left
+        node.left = reversed_node.right
+        reversed_node.right = node
+        return reversed_node
+    
+    def is_balanced(self, node: Node) -> bool:
+        return self.height(node.left) == self.height(node.right)
+
+    def height(self, node: Node) -> int:
+        if not node:
+           return 0
+        return 1 + max(self.height(node.right), self.height(node.left))
+
+    def balance_node(self, node: Node) -> Node:
+        diff = self._bfactor(node)
+        while(diff != 0):
+            node = self._rotations(node, diff)
+            diff = self._bfactor(node)
+        if node.left:
+            node.left = self.balance_node(node.left)
+        if node.right:
+            node.right = self.balance_node(node.right) 
+        return node
+
+    def _bfactor(self, node: Node) -> int:
+        left_height =  0 if not node.left else self.height(node.left)
+        right_height = 0 if not node.right else self.height(node.right)
+       	return left_height - right_height
+    
+    def _rotations(self, node: Node, diff: int) -> Node:
+        if diff == 0:
+            return node
+        elif diff > 0:
+            if self._bfactor(node.left) < 0:
+                node = self.rotate_left(node.left)
+            node = self.rotate_right(node)
+        else:
+            if self._bfactor(node.right) > 0:
+               node.right = self.rotate_right(node.right)
+            node = self.rotate_left(node) 
+        return node
+        
+    def min_k_key(self, k: int) -> Node:
+        counter = 0
+        return self.find_k_node(counter, k, self.root)
+  
+    def find_k_node(self, counter: int, k: int, node: Node) -> Node:
+        if counter == k:
+           return node
+        if node.left:
+           deeper_node = node.left
+        elif node.right:
+           deeper_node = node.right
+        else:
+           deeper_node = node
+        counter += 1
+        return self.find_k_node(counter, k, deeper_node)  
