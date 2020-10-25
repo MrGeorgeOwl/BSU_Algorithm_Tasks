@@ -1,7 +1,8 @@
 import pdb
 import pytest
 
-from hash import hash, HashTable
+from hash import HashTable
+from hash_functions import hash
 
 @pytest.mark.parametrize("key, table_size, exp", [
     (1, 50, 15),
@@ -31,16 +32,15 @@ def test_table_get_value_while_no_key():
         table.get_value_of_key(0)
 
 
-def test_chaining_resolver(table_with_chain_resolver):
-    table_with_chain_resolver.add_key(5, "first_chain")
-    table_with_chain_resolver.add_key(24, "second_chain")
-    assert table_with_chain_resolver.get_value_of_key(5) == "first_chain"
-    assert table_with_chain_resolver.get_value_of_key(24) == "second_chain"
-
-
-def test_linear_resolver(table_with_linear_resolver):
-    table_with_linear_resolver.add_key(5, "first")
-    table_with_linear_resolver.add_key(24, "second")
-    assert table_with_linear_resolver.get_value_of_key(5) == 'first'
-    assert table_with_linear_resolver.get_value_of_key(24) == 'second'
+@pytest.mark.parametrize("table", [
+    "table_with_chain_resolver",
+    "table_with_linear_resolver",
+    "table_with_double_resolver",
+])
+def test_chaining_resolver(request, table):
+    table = request.getfixturevalue(table)
+    table.add_key(5, "first_chain")
+    table.add_key(24, "second_chain")
+    assert table.get_value_of_key(5) == "first_chain"
+    assert table.get_value_of_key(24) == "second_chain"
 

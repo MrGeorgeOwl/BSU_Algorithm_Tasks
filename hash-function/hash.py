@@ -2,15 +2,6 @@ from typing import Any, Callable, Optional
 
 from resolvers import CollisionResolver
 
-A = 0.31506
-
-def hash(table_size: int, key: int) -> int:
-    """
-    Hash function which uses multiplication method.
-    """
-    return int(table_size * (key * A % 1)) 
-
-
 class Node:
     def __init__(self, value: Any, key: int):
         self.value = value
