@@ -1,8 +1,9 @@
+from node import Node
 from hash_functions import double_hash
 
 class CollisionResolver:
 
-    def resolve_collision(self, table, index, key):
+    def resolve_collision(self, table, index, value, key):
         raise Exception(f"Already occupied index: {index}")    
 
     def find_node(self, table, index, key):
@@ -18,7 +19,7 @@ class ChainCollisionResolver(CollisionResolver):
 
     def find_node(self, table, index, key):
         current = table.array[index] 
-        while(current != None or current.key != key):
+        while current is not None and current.key != key:
             current = current.next
         if current:
             return current

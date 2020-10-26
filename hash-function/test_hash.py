@@ -1,4 +1,3 @@
-import pdb
 import pytest
 
 from hash import HashTable
@@ -39,8 +38,8 @@ def test_table_get_value_while_no_key():
 ])
 def test_chaining_resolver(request, table):
     table = request.getfixturevalue(table)
-    table.add_key(5, "first_chain")
-    table.add_key(24, "second_chain")
-    assert table.get_value_of_key(5) == "first_chain"
-    assert table.get_value_of_key(24) == "second_chain"
+    table.add_key(1, "first_chain")
+    table.add_key(20, "second_chain")
+    assert table.get_value_of_key(1) == "first_chain"
+    assert table.get_value_of_key(20) == "second_chain"
 

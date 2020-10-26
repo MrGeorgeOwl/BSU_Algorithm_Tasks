@@ -12,7 +12,7 @@ def hash_division_method(table_size: int, key: int) -> int:
     """
     Hash function which uses division method.
     """
-    return k % table_size
+    return key % table_size
 
 
 def double_hash(table_size: int, key: int, multiplier: int = 1) -> int:

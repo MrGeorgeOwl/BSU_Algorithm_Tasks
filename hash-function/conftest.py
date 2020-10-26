@@ -1,6 +1,6 @@
 import pytest
 
-from hash import HashTable, Node
+from hash import HashTable
 from hash_functions import hash
 from resolvers import (
     ChainCollisionResolver,
