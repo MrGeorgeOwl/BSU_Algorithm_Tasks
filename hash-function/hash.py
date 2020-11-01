@@ -1,4 +1,3 @@
-import pdb
 from typing import Any, Callable, Optional
 
 from resolvers import CollisionResolver
@@ -6,14 +5,13 @@ from node import Node
 
 class HashTable:
 
-    def __init__(self, hash_function: Callable[[int, int], int]):
-        self.array = [None for _ in range(50)]
+    def __init__(self, hash_function: Callable[[int, int], int], table_size: int = 50):
+        self.array = [None for _ in range(table_size)]
         self.hash_function = hash_function
         self.collision_resolver = CollisionResolver()
 
     def add_key(self, key: int, value: Any) -> int:
         index = self.hash_function(len(self.array), key)
-#        pdb.set_trace()
         if not self.array[index]:
             self.array[index] = Node(value, key)
         else:
