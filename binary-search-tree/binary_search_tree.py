@@ -1,5 +1,4 @@
-import pdb
-from typing import List
+from typing import List, Optional, Tuple, Union
 
 
 class Node:
@@ -8,13 +7,12 @@ class Node:
         self.left = left
         self.right = right
         self.key = key
-        
-        self.left_count = 0
 
 
 class Tree:
+
     def __init__(self):
-        self.root = None 
+        self.root = None
     
     def add_node(self, key: int):
         if self.root is None:
@@ -31,7 +29,6 @@ class Tree:
             self._add_right_node(node, key)
         
     def _add_left_node(self, node: Node, key: int):
-        node.left_count += 1
         if node.left is None:
             node.left = Node(None, None, key)
         elif node.left.key == key:
@@ -68,25 +65,20 @@ class Tree:
             nodes.append(node)
             self.inorder_walk_reverse(node.left, nodes)
 
-    def rotate_left(self, node: Node):
+    def _rotate_left(self, node: Node) -> Node:
         reversed_node = node.right
         node.right = reversed_node.left
         reversed_node.left = node
         return reversed_node
     
-    def rotate_right(self, node: Node):
+    def _rotate_right(self, node: Node) -> Node:
         reversed_node = node.left
         node.left = reversed_node.right
         reversed_node.right = node
         return reversed_node
     
     def is_balanced(self, node: Node) -> bool:
-        return self.height(node.left) == self.height(node.right)
-
-    def height(self, node: Node) -> int:
-        if not node:
-           return 0
-        return 1 + max(self.height(node.right), self.height(node.left))
+        return height(node.left) == height(node.right)
 
     def balance_node(self, node: Node) -> Node:
         diff = self._bfactor(node)
@@ -100,8 +92,8 @@ class Tree:
         return node
 
     def _bfactor(self, node: Node) -> int:
-        left_height =  0 if not node.left else self.height(node.left)
-        right_height = 0 if not node.right else self.height(node.right)
+        left_height =  0 if not node.left else height(node.left)
+        right_height = 0 if not node.right else height(node.right)
        	return left_height - right_height
     
     def _rotations(self, node: Node, diff: int) -> Node:
@@ -109,25 +101,52 @@ class Tree:
             return node
         elif diff > 0:
             if self._bfactor(node.left) < 0:
-                node = self.rotate_left(node.left)
-            node = self.rotate_right(node)
+                node.left = self._rotate_left(node.left)
+            node = self._rotate_right(node)
         else:
             if self._bfactor(node.right) > 0:
-               node.right = self.rotate_right(node.right)
-            node = self.rotate_left(node) 
+               node.right = self._rotate_right(node.right)
+            node = self._rotate_left(node) 
         return node
       
-    def find_k_element(self, k: int) -> int: 
-        element_value = -1
-        if self.root: 
-            current = self.root
+    def find_k_element(self, node: Node, k: int) -> Union[Optional[Node], Tuple[Optional[Node], List[int]]]: 
+        element = None
+        left_count = child_count(node.left)
+        if node:
+            current = node
             while current:
-                if current and current.left_count + 1 == k:
-                    element_value = current.key
+                if child_count(current.left) + 1 == k:
+                    element = current
                     current = None
-                elif k > current.left_count:
-                    k = k - current.left_count + 1
+                elif k > child_count(current.left):
+                    k = k - (child_count(current.left) + 1)
                     current = current.right
                 else:
                     current = current.left
-        return element_value
+                    
+        return element
+    
+    def balance_by_kth_min_element(self, node: Node):
+        k = int((child_count(node.left) + child_count(node.right)) / 2) + 1
+        kth_element = self.find_k_element(node, k)
+
+        while(node.key != kth_element.key):
+            node = self._rotations(node, self._bfactor(node))
+            diff = self._bfactor(node)
+        if node.left:
+            node.left = self.balance_by_kth_min_element(node.left)
+        if node.right:
+            node.right = self.balance_by_kth_min_element(node.right) 
+        return node
+
+
+def height(node: Node) -> int:
+    if not node:
+        return 0
+    return 1 + max(height(node.right), height(node.left))
+
+
+def child_count(node: Node) -> int:
+    if not node:
+        return 0
+    return 1 + child_count(node.right) + child_count(node.left)
