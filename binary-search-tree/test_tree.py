@@ -64,11 +64,10 @@ def test_balance_node(unbalanced_tree):
     assert unbalanced_tree.is_balanced(balanced_node)
 
 
-@pytest.mark.parametrize("k, exp_value", [
-    (2, 1),
-    (3, 1),
-    (0, 4),
-])
-def test_min_k_node(k, exp_value, balanced_tree):
-    min_k_node = balanced_tree.min_k_key(k)
-    assert min_k_node.key == exp_value
+def test_left_count(balanced_tree):
+    assert balanced_tree.root.left_count == 3
+
+
+@pytest.mark.parametrize("k", [3, 2, 4])
+def test_k_min_element(k, balanced_tree):
+    balanced_tree.find_k_element(k) == k
