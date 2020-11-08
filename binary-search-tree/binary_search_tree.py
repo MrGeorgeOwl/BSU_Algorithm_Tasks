@@ -8,6 +8,8 @@ class Node:
         self.left = left
         self.right = right
         self.key = key
+        
+        self.left_count = 0
 
 
 class Tree:
@@ -29,6 +31,7 @@ class Tree:
             self._add_right_node(node, key)
         
     def _add_left_node(self, node: Node, key: int):
+        node.left_count += 1
         if node.left is None:
             node.left = Node(None, None, key)
         elif node.left.key == key:
@@ -113,19 +116,18 @@ class Tree:
                node.right = self.rotate_right(node.right)
             node = self.rotate_left(node) 
         return node
-        
-    def min_k_key(self, k: int) -> Node:
-        counter = 0
-        return self.find_k_node(counter, k, self.root)
-  
-    def find_k_node(self, counter: int, k: int, node: Node) -> Node:
-        if counter == k:
-           return node
-        if node.left:
-           deeper_node = node.left
-        elif node.right:
-           deeper_node = node.right
-        else:
-           deeper_node = node
-        counter += 1
-        return self.find_k_node(counter, k, deeper_node)  
+      
+    def find_k_element(self, k: int) -> int: 
+        element_value = -1
+        if self.root: 
+            current = self.root
+            while current:
+                if current and current.left_count + 1 == k:
+                    element_value = current.key
+                    current = None
+                elif k > current.left_count:
+                    k = k - current.left_count + 1
+                    current = current.right
+                else:
+                    current = current.left
+        return element_value
