@@ -13,7 +13,7 @@ class Tree:
 
     def __init__(self):
         self.root = None
-    
+
     def add_node(self, key: int):
         if self.root is None:
             self.root = Node(None, None, key)
@@ -27,12 +27,12 @@ class Tree:
             self._add_left_node(node, key)
         elif node.key < key:
             self._add_right_node(node, key)
-        
+
     def _add_left_node(self, node: Node, key: int):
         if node.left is None:
             node.left = Node(None, None, key)
         elif node.left.key == key:
-            return 
+            return
         else:
             self._recursive_add(node.left, key)
 
@@ -43,11 +43,11 @@ class Tree:
             return
         else:
             self._recursive_add(node.right, key)
-    
+
     def search_key(self, node: Node, key: int) -> Node:
         if not node or node.key == key:
             return node
-        
+
         if node.key < key:
             return self.search_key(node.right, key)
         else:
@@ -58,7 +58,7 @@ class Tree:
             self.inorder_walk(node.left, nodes)
             nodes.append(node)
             self.inorder_walk(node.right, nodes)
-    
+
     def inorder_walk_reverse(self, node: Node, nodes: List[Node] = []) -> List[Node]:
         if node:
             self.inorder_walk_reverse(node.right, nodes)
@@ -70,13 +70,13 @@ class Tree:
         node.right = reversed_node.left
         reversed_node.left = node
         return reversed_node
-    
+
     def _rotate_right(self, node: Node) -> Node:
         reversed_node = node.left
         node.left = reversed_node.right
         reversed_node.right = node
         return reversed_node
-    
+
     def is_balanced(self, node: Node) -> bool:
         return height(node.left) == height(node.right)
 
@@ -88,14 +88,14 @@ class Tree:
         if node.left:
             node.left = self.balance_node(node.left)
         if node.right:
-            node.right = self.balance_node(node.right) 
+            node.right = self.balance_node(node.right)
         return node
 
     def _bfactor(self, node: Node) -> int:
         left_height =  0 if not node.left else height(node.left)
         right_height = 0 if not node.right else height(node.right)
        	return left_height - right_height
-    
+
     def _rotations(self, node: Node, diff: int) -> Node:
         if diff == 0:
             return node
@@ -106,10 +106,10 @@ class Tree:
         else:
             if self._bfactor(node.right) > 0:
                node.right = self._rotate_right(node.right)
-            node = self._rotate_left(node) 
+            node = self._rotate_left(node)
         return node
-      
-    def find_k_element(self, node: Node, k: int) -> Union[Optional[Node], Tuple[Optional[Node], List[int]]]: 
+
+    def find_k_element(self, node: Node, k: int) -> Union[Optional[Node], Tuple[Optional[Node], List[int]]]:
         element = None
         left_count = child_count(node.left)
         if node:
@@ -123,9 +123,9 @@ class Tree:
                     current = current.right
                 else:
                     current = current.left
-                    
+
         return element
-    
+
     def balance_by_kth_min_element(self, node: Node):
         k = int((child_count(node.left) + child_count(node.right)) / 2) + 1
         kth_element = self.find_k_element(node, k)
@@ -136,7 +136,7 @@ class Tree:
         if node.left:
             node.left = self.balance_by_kth_min_element(node.left)
         if node.right:
-            node.right = self.balance_by_kth_min_element(node.right) 
+            node.right = self.balance_by_kth_min_element(node.right)
         return node
 
 
