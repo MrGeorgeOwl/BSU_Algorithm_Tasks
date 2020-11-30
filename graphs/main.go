@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 // DepthFirstSearch finds components of graph
 func DepthFirstSearch(nodes [][]int) [][]int {
@@ -63,6 +66,99 @@ func getAmountOfUsedNodes(used []bool) int {
 	return amountOfUsedNodes
 }
 
+// Edge is a struct of edge in graph
+type Edge struct {
+	source int
+	dest int
+}
+
+// EulerError error for case when euler cycle cant be build
+type EulerError struct {}
+
+func (e *EulerError) Error() string {
+	return fmt.Sprintf("Euler cycle cant be build\n")
+}
+
+// FindEulerCycle will return slice of indexes
+// which represents Euler cycle
+func FindEulerCycle(nodes [][]int) ([]int, error) {
+	if !IsEuler(nodes) {
+		return nil, &EulerError{}
+	}
+	cycle := make([]int, 0)
+	way := make([]int, 0)
+	curr := 0
+
+	for {
+		// if current node dont have free edges then go back to previous node
+		if len(nodes[curr]) == 0 && freeEdgesExists(nodes) {
+			for len(nodes[curr]) == 0 {
+				cycle = append(cycle, curr)
+				curr = way[len(way) - 2]
+				way = way[:len(way) - 1]
+			}
+		}
+		// check if there any edge left
+		if !freeEdgesExists(nodes) {
+			break
+		}
+		// adding node to way and deleting edge from graph
+		edge := Edge{curr, nodes[curr][0]}
+		way = append(way, curr)
+		curr = nodes[curr][0]
+		removeEdgeFromGraph(nodes, edge)
+	}
+	for i := len(way) - 1; i >= 0; i-- {
+		cycle = append(cycle, way[i])
+	}
+	return cycle, nil
+}
+
+func freeEdgesExists(nodes [][]int) bool {
+	nodesWithDest := make([][]int, 0)
+
+	for _, node := range nodes {
+		if len(node) != 0 {
+			nodesWithDest = append(nodesWithDest, node)
+		}
+	}
+
+	return len(nodesWithDest) > 0
+}
+
+func removeEdgeFromGraph(nodes [][]int, edge Edge) {
+	node := nodes[edge.source]
+	if len(node) == 1 {
+		node = []int{}
+	} else {
+		node = node[1:]
+	}
+	nodes[edge.source] = node
+	if index := Find(nodes[edge.dest], edge.source); index != -1 {
+		nodes[edge.dest] = append(nodes[edge.dest][:index], nodes[edge.dest][index + 1:]...)
+	}
+}
+
+// Find index of node in nodes slice
+func Find(node []int, index int) int {
+	for i, v := range node {
+		if v == index {
+			return i
+		}
+	}
+	return -1
+}
+
+// IsEuler returns true if Euler cycle can be found in graph
+func IsEuler(nodes [][]int) bool {
+	for _, v := range nodes {
+		if len(v) % 2 != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
 	nodes := [][]int {
 		{1, 2},
@@ -77,8 +173,18 @@ func main() {
 	comps := DepthFirstSearch(nodes)
 	fmt.Println(comps)
 
-	// Define another graph
-	// Find Euler cycle
+	nodes = [][]int {
+		{1, 4},
+		{0, 2, 3, 5},
+		{1, 3, 4, 5},
+		{2, 1, 5, 4},
+		{3, 2, 5, 0},
+		{1, 2, 3, 4}}
+	cycle, err := FindEulerCycle(nodes)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(cycle)
 
 	// Define another graph
 	// Define is it dicotyledonous
