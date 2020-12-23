@@ -219,6 +219,7 @@ func changeColor(currentColor *rune, colors []rune) {
 }
 
 func main() {
+	fmt.Println("=====Components=====")
 	nodes := [][]int{
 		{1, 2},
 		{0, 2},
@@ -232,6 +233,7 @@ func main() {
 	comps := DepthFirstSearch(nodes)
 	fmt.Println(comps)
 
+	fmt.Println("\n=====Euler=====")
 	nodes = [][]int{
 		{1, 4},
 		{0, 2, 3, 5},
@@ -245,9 +247,7 @@ func main() {
 	}
 	fmt.Println(cycle)
 
-	// Define another graph
-	// Define is it dicotyledonous
-	// If it is then find a share
+	fmt.Println("\n=====Bipartite======")
 	bipartiteGraph := []BipartiteNode{
 		BipartiteNode{[]int{1, 4}, 0},
 		BipartiteNode{[]int{0, 2, 6}, 0},
