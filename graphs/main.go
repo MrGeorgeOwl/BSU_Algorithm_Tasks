@@ -110,6 +110,9 @@ func FindEulerCycle(nodes [][]int) ([]int, error) {
 	for i := len(way) - 1; i >= 0; i-- {
 		cycle = append(cycle, way[i])
 	}
+	for index := range cycle {
+		cycle[index] = cycle[index] + 1
+	}
 	return cycle, nil
 }
 
@@ -197,6 +200,7 @@ func BuildBipartite(graph *[]BipartiteNode) ([]int, []int, error) {
 				return nil, nil, &NotBipartiteError{}
 			}
 		}
+		// take node if it doesnt have color then set color to opposite of current color and put to queue else dont do anything
 		(*graph)[index].color = currentColor
 		switch currentColor {
 		case 'r':
@@ -219,49 +223,55 @@ func changeColor(currentColor *rune, colors []rune) {
 }
 
 func main() {
-	fmt.Println("=====Components=====")
-	nodes := [][]int{
-		{1, 2},
-		{0, 2},
-		{0, 1},
-		{4},
-		{3},
-		{6, 7, 8},
-		{5, 8},
-		{5, 8},
-		{5, 6, 7}}
-	comps := DepthFirstSearch(nodes)
-	fmt.Println(comps)
+	// fmt.Println("=====Components=====")
+	// nodes := [][]int{
+	// 	{1, 2},
+	// 	{0, 2},
+	// 	{0, 1},
+	// 	{4},
+	// 	{3},
+	// 	{6, 7, 8},
+	// 	{5, 8},
+	// 	{5, 8},
+	// 	{5, 6, 7}}
+	// comps := DepthFirstSearch(nodes)
+	// fmt.Println(comps)
 
-	fmt.Println("\n=====Euler=====")
-	nodes = [][]int{
-		{1, 4},
-		{0, 2, 3, 5},
-		{1, 3, 4, 5},
-		{2, 1, 5, 4},
-		{3, 2, 5, 0},
-		{1, 2, 3, 4}}
-	cycle, err := FindEulerCycle(nodes)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(cycle)
+	// fmt.Println("\n=====Euler=====")
+	// nodes := [][]int{
+	// 	{1, 2, 3, 6, 5, 4, 9, 8},
+	// 	{0, 2, 3, 7, 6, 5, 4, 9},
+	// 	{1, 0, 3, 7, 6, 5},
+	// 	{2, 1, 0, 11, 7, 6},
+	// 	{0, 1, 5, 6, 9, 8},
+	// 	{4, 0, 1, 2, 6, 10, 9, 8},
+	// 	{5, 0, 1, 2, 3, 7, 11, 10, 9, 4},
+	// 	{6, 1, 2, 3, 11, 10},
+	// 	{0, 4, 5, 9, 10, 11},
+	// 	{8, 4, 1, 5, 6, 10, 11, 0},
+	// 	{9, 5, 6, 7, 11, 8},
+	// 	{10, 6, 7, 3, 8, 9}}
+	// cycle, err := FindEulerCycle(nodes)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(cycle)
 
-	fmt.Println("\n=====Bipartite======")
-	bipartiteGraph := []BipartiteNode{
-		BipartiteNode{[]int{1, 4}, 0},
-		BipartiteNode{[]int{0, 2, 6}, 0},
-		BipartiteNode{[]int{1, 3, 4}, 0},
-		BipartiteNode{[]int{2, 5}, 0},
-		BipartiteNode{[]int{0, 2, 5, 6}, 0},
-		BipartiteNode{[]int{3, 4}, 0},
-		BipartiteNode{[]int{1, 4}, 0},
-	}
+	// fmt.Println("\n=====Bipartite======")
+	// bipartiteGraph := []BipartiteNode{
+	// 	BipartiteNode{[]int{1, 4}, 0},
+	// 	BipartiteNode{[]int{0, 2, 6}, 0},
+	// 	BipartiteNode{[]int{1, 3, 4}, 0},
+	// 	BipartiteNode{[]int{2, 5}, 0},
+	// 	BipartiteNode{[]int{0, 2, 5, 6}, 0},
+	// 	BipartiteNode{[]int{3, 4}, 0},
+	// 	BipartiteNode{[]int{1, 4}, 0},
+	// }
 
-	graph1, graph2, err := BuildBipartite(&bipartiteGraph)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(graph1)
-	fmt.Println(graph2)
+	// graph1, graph2, err := BuildBipartite(&bipartiteGraph)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(graph1)
+	// fmt.Println(graph2)
 }
