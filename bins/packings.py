@@ -55,7 +55,6 @@ def first_fit_decreasing(bin_weight, element_weights):
 
 
 if __name__ == "__main__":
-    random.seed(100)
     weights = [random.random() for _ in range(10_000)]
     bin_weight = 1
     for algo in (next_fit, first_fit, best_fit, first_fit_decreasing):
