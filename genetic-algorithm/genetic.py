@@ -1,15 +1,15 @@
 import random
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Callable
 
 from numpy import mean
 
 BORDER = 100
 POPULATION_AMOUNT = 1000
-RESULT = -50
+RESULT = 22
 SELECTION_SIZE = round(0.6 * POPULATION_AMOUNT)
 RANDOM_SUBSET_SIZE = POPULATION_AMOUNT
-MUTATION_PROBABILITY = 10
+MUTATION_PROBABILITY = 40
 CHILD_TO_MUTATE = round(SELECTION_SIZE / 4)
 
 
@@ -43,10 +43,9 @@ class Individual:
             setattr(
                 self,
                 attr,
-                (random.randint(-50, 50) if random.random() * 100 > MUTATION_PROBABILITY
+                (random.randint(-BORDER, BORDER) if random.random() * 100 > MUTATION_PROBABILITY
                  else getattr(self, attr)),
             )
-
 
 
 def multipoint_crossover(
@@ -73,7 +72,7 @@ def onepoint_crossover(
     )
 
 
-def f(individual: Individual):
+def f1(individual: Individual):
     u, w, x, y, z = individual.get_params()
     return (
             u ** 2 * w ** 2 * x ** 2 * y * z ** 2
@@ -84,13 +83,35 @@ def f(individual: Individual):
     )
 
 
-def fitness(individual: Individual):
-    return abs(RESULT - f(individual))
+def f2(individual: Individual):
+    u, w, x, y, z = individual.get_params()
+    return (
+        w**2 * x * y**2
+        + u**2 * x**2 * y**2
+        + u * w**2 * x * y
+        + x**2 * z**2
+        + z
+    )
 
 
-def tournament_selection(population: List[Individual]):
+def f3(individual: Individual):
+    u, w, x, y, z = individual.get_params()
+    return (
+        w**2 * z
+        + u * z**2
+        + y**2
+        + u * w * x**2 * y**2 * z**2
+        + w * y * z
+    )
+
+
+def fitness(individual: Individual, target: Callable):
+    return abs(RESULT - target(individual))
+
+
+def tournament_selection(population: List[Individual], target: Callable):
     random_subset = random.sample(population, RANDOM_SUBSET_SIZE)
-    return sorted(random_subset, key=fitness)[:SELECTION_SIZE]
+    return sorted(random_subset, key=lambda x: fitness(x, target))[:SELECTION_SIZE]
 
 
 def make_crossover(
@@ -115,29 +136,36 @@ def make_crossover(
     ]
 
 
-def mutation(population: List[Individual]):
-    for child in list(reversed(list(sorted(population, key=fitness))))[:CHILD_TO_MUTATE]:
+def mutation(population: List[Individual], target):
+    for child in list(reversed(list(sorted(population, key=lambda x: fitness(x, target)))))[:CHILD_TO_MUTATE]:
         child.mutate()
 
 
-def substitution(new_children: List[Individual]) -> List[Individual]:
-    return list(sorted(new_children, key=fitness))[:POPULATION_AMOUNT]
+def substitution(new_children: List[Individual], target) -> List[Individual]:
+    return list(sorted(new_children, key=lambda x: fitness(x, target)))[:POPULATION_AMOUNT]
 
 
-def genetic():
+def genetic(target):
     population = [Individual() for _ in range(POPULATION_AMOUNT)]
+    generation = 1
     while True:
         children = make_crossover(
-            tournament_selection(population),
+            tournament_selection(population, target),
         )
-        mutation(children)
-        population = substitution(children)
-        target_assessments = sorted([fitness(parent) for parent in population])
-        print(f'min - {target_assessments[0]}; avg - {mean(target_assessments)}')
+        mutation(children, target)
+        population = substitution(children, target)
+        target_assessments = sorted([fitness(child, target) for child in population])
+        print(f'min - {target_assessments[0]}; avg - {mean(target_assessments)}; generation - {generation}')
         if target_assessments[0] == 0:
             break
-    print(sorted(population, key=fitness)[0].get_params())
+        generation += 1
+    print(sorted(population, key=lambda x: fitness(x, target))[0].get_params())
 
 
 if __name__ == '__main__':
-    genetic()
+    # print(f"{f1.__name__}")
+    # genetic(f1)
+    # print(f"{f2.__name__}")
+    # genetic(f2)
+    print(f"{f3.__name__}")
+    genetic(f3)
